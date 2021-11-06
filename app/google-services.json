@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "273474113970",
+    "project_id": "laze-519ec",
+    "storage_bucket": "laze-519ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273474113970:android:2f8096cba371034a3d94ab",
+        "android_client_info": {
+          "package_name": "com.example.laze"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273474113970-rt3oa8t66b940lfphf7tvc8hsom75qln.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBADuQMgCv_AWjW3X3dDcnu7XS5oQgfd0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273474113970-rt3oa8t66b940lfphf7tvc8hsom75qln.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
