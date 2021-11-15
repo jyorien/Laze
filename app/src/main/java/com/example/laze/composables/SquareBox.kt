@@ -20,7 +20,7 @@ fun SquareBox(content: @Composable () -> Unit) {
     Card(modifier = Modifier
         .border(BorderStroke(1.dp, Color.Black))
         .width(560.dp)
-        .padding(horizontal = 20.dp, vertical = 80.dp)) {
+        .padding(horizontal = 20.dp, vertical = 60.dp)) {
         content()
     }
 

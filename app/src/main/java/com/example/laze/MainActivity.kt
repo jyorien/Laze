@@ -14,16 +14,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.laze.screens.LoginScreen
+import com.example.laze.screens.RegisterScreen
 import com.example.laze.ui.theme.LazeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         setContent {
             LazeTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "LoginScreen") {
-                    composable("LoginScreen") { LoginScreen() }
+                    composable("LoginScreen") { LoginScreen(navController) }
+                    composable("RegisterScreen") { RegisterScreen(navController) }
                 }
             }
         }
