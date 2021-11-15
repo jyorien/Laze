@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,9 +19,9 @@ import com.example.laze.composables.SquareBox
 
 @Composable
 fun RegisterScreen(navController: NavController) {
-    var signUpEmail = ""
-    var signUpPass = ""
-    var signUpCfmPass = ""
+    var signUpEmail by remember { mutableStateOf("") }
+    var signUpPass by remember { mutableStateOf("") }
+    var signUpCfmPass by remember { mutableStateOf("") }
     Scaffold {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -31,7 +31,10 @@ fun RegisterScreen(navController: NavController) {
         ) {
             AppLogo()
             SquareBox {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.padding(10.dp)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(10.dp)
+                ) {
                     Text(
                         "Login",
                         textAlign = TextAlign.Center,
@@ -49,7 +52,7 @@ fun RegisterScreen(navController: NavController) {
 
                     InputTextField(inputValue = signUpCfmPass, inputValueOnChange = {
                         signUpCfmPass = it
-                    }, label = "Password", keyboard = KeyboardType.Password, isVisible = false)
+                    }, label = "Confirm Password", keyboard = KeyboardType.Password, isVisible = false)
 
                     Box(Modifier.height(10.dp))
                     Button(onClick = { /*TODO*/ }, Modifier.fillMaxWidth()) {
