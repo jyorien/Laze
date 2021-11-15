@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,9 +26,8 @@ import com.example.laze.composables.SquareBox
 
 @Composable
 fun LoginScreen(navController: NavController?) {
-    var inputEmail by remember { mutableStateOf("") }
-    var inputPassword by remember { mutableStateOf("") }
-    val context = LocalContext.current
+    var inputEmail by rememberSaveable { mutableStateOf("") }
+    var inputPassword by rememberSaveable { mutableStateOf("") }
     Scaffold {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
