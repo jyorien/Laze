@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -23,11 +24,16 @@ import com.example.laze.R
 import com.example.laze.composables.AppLogo
 import com.example.laze.composables.InputTextField
 import com.example.laze.composables.SquareBox
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(navController: NavController?) {
+    val mAuth = FirebaseAuth.getInstance()
     var inputEmail by rememberSaveable { mutableStateOf("") }
     var inputPassword by rememberSaveable { mutableStateOf("") }
+    var isEmailError by remember { mutableStateOf(false) }
+    var isPassError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     Scaffold {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -37,7 +43,10 @@ fun LoginScreen(navController: NavController?) {
         ) {
             AppLogo()
             SquareBox {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.padding(10.dp)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(10.dp)
+                ) {
                     Text(
                         "Login",
                         textAlign = TextAlign.Center,
@@ -47,15 +56,42 @@ fun LoginScreen(navController: NavController?) {
                     Box(Modifier.height(10.dp))
                     InputTextField(inputValue = inputEmail, inputValueOnChange = {
                         inputEmail = it
-                    }, label = "Email", keyboard = KeyboardType.Email, isVisible = true)
+                    }, label = "Email", isVisible = true, isEmailError)
 
                     InputTextField(inputValue = inputPassword, inputValueOnChange = {
                         inputPassword = it
-                    }, label = "Password", keyboard = KeyboardType.Password, isVisible = false)
+                    }, label = "Password", isVisible = false, isPassError)
                     Box(Modifier.height(10.dp))
-                    Button(onClick = { /*TODO*/ }, Modifier.fillMaxWidth()) {
+                    Button(onClick = {
+                        isEmailError = false
+                        isPassError = false
+                        if (inputEmail.isEmpty()) {
+                            isEmailError = true
+                            errorMessage = "Email cannot be empty"
+                            return@Button
+                        } else if (inputPassword.isEmpty()) {
+                            isPassError = true
+                            errorMessage = "Password cannot be empty!"
+                            return@Button
+                        }
+                        mAuth.signInWithEmailAndPassword(inputEmail, inputPassword)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    // TODO log user in
+                                }
+                                else {
+                                    task.exception?.let {
+                                        errorMessage = it.localizedMessage
+                                    }
+                                }
+                            }
+                    }, Modifier.fillMaxWidth()) {
                         Text(text = "LOGIN")
                     }
+                    // error message
+                    if (isEmailError || isPassError)
+                        Text(errorMessage, color = Color.Red)
+
                     Text(text = "No account? Sign up here", modifier = Modifier.clickable {
                         navController!!.navigate("RegisterScreen")
                     }, textAlign = TextAlign.Center)
