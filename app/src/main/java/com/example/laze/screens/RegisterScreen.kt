@@ -10,8 +10,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth
 fun RegisterScreen(navController: NavController) {
     val mAuth = FirebaseAuth.getInstance()
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
 
     var signUpEmail by remember { mutableStateOf("") }
     var signUpPass by remember { mutableStateOf("") }
@@ -33,7 +37,7 @@ fun RegisterScreen(navController: NavController) {
     var isEmailError by remember { mutableStateOf(false) }
     var isPassError by remember { mutableStateOf(false) }
     var isCfmPassError by remember { mutableStateOf(false) }
-    var isGeneralError by remember { mutableStateOf(false)}
+    var isGeneralError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
     Scaffold {
@@ -56,13 +60,29 @@ fun RegisterScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(Modifier.height(10.dp))
-                    InputTextField(inputValue = signUpEmail, inputValueOnChange = {
-                        signUpEmail = it
-                    }, label = "Email", isVisible = true, isEmailError)
+                    InputTextField(
+                        inputValue = signUpEmail,
+                        inputValueOnChange = {
+                            signUpEmail = it
+                        },
+                        label = "Email",
+                        isVisible = true,
+                        isEmailError,
+                        focusManager,
+                        focusRequester
+                    )
 
-                    InputTextField(inputValue = signUpPass, inputValueOnChange = {
-                        signUpPass = it
-                    }, label = "Password", isVisible = false, isPassError)
+                    InputTextField(
+                        inputValue = signUpPass,
+                        inputValueOnChange = {
+                            signUpPass = it
+                        },
+                        label = "Password",
+                        isVisible = false,
+                        isPassError,
+                        focusManager,
+                        focusRequester
+                    )
 
                     InputTextField(
                         inputValue = signUpCfmPass,
@@ -71,7 +91,9 @@ fun RegisterScreen(navController: NavController) {
                         },
                         label = "Confirm Password",
                         isVisible = false,
-                        isCfmPassError
+                        isCfmPassError,
+                        focusManager,
+                        focusRequester
                     )
 
                     Box(Modifier.height(10.dp))
@@ -84,8 +106,7 @@ fun RegisterScreen(navController: NavController) {
                             isGeneralError = true
                             errorMessage = "Fields cannot be empty"
                             return@Button
-                        }
-                        else if (!Patterns.EMAIL_ADDRESS.matcher(signUpEmail).matches()) {
+                        } else if (!Patterns.EMAIL_ADDRESS.matcher(signUpEmail).matches()) {
                             isEmailError = true
                             errorMessage = "Email is badly formatted!"
                             return@Button
@@ -103,7 +124,11 @@ fun RegisterScreen(navController: NavController) {
                         mAuth.createUserWithEmailAndPassword(signUpEmail, signUpPass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    Toast.makeText(context, "User has been created!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "User has been created!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     signUpEmail = ""
                                     signUpPass = ""
                                     signUpCfmPass = ""

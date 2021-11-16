@@ -10,8 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +31,9 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun LoginScreen(navController: NavController?) {
     val mAuth = FirebaseAuth.getInstance()
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
     var inputEmail by rememberSaveable { mutableStateOf("") }
     var inputPassword by rememberSaveable { mutableStateOf("") }
     var isEmailError by remember { mutableStateOf(false) }
@@ -54,13 +59,29 @@ fun LoginScreen(navController: NavController?) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(Modifier.height(10.dp))
-                    InputTextField(inputValue = inputEmail, inputValueOnChange = {
-                        inputEmail = it
-                    }, label = "Email", isVisible = true, isEmailError)
+                    InputTextField(
+                        inputValue = inputEmail,
+                        inputValueOnChange = {
+                            inputEmail = it
+                        },
+                        label = "Email",
+                        isVisible = true,
+                        isEmailError,
+                        focusManager,
+                        focusRequester
+                    )
 
-                    InputTextField(inputValue = inputPassword, inputValueOnChange = {
-                        inputPassword = it
-                    }, label = "Password", isVisible = false, isPassError)
+                    InputTextField(
+                        inputValue = inputPassword,
+                        inputValueOnChange = {
+                            inputPassword = it
+                        },
+                        label = "Password",
+                        isVisible = false,
+                        isPassError,
+                        focusManager,
+                        focusRequester
+                    )
                     Box(Modifier.height(10.dp))
                     Button(onClick = {
                         isEmailError = false
@@ -78,8 +99,7 @@ fun LoginScreen(navController: NavController?) {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     navController!!.navigate("HomeScreen") { navController.popBackStack() }
-                                }
-                                else {
+                                } else {
                                     task.exception?.let {
                                         errorMessage = it.localizedMessage!!
                                     }
