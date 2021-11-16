@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.laze.screens.HomeScreen
 import com.example.laze.screens.LoginScreen
 import com.example.laze.screens.RegisterScreen
 import com.example.laze.ui.theme.LazeTheme
@@ -27,6 +28,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "LoginScreen") {
                     composable("LoginScreen") { LoginScreen(navController) }
                     composable("RegisterScreen") { RegisterScreen(navController) }
+                    composable("HomeScreen") { HomeScreen(navController)}
                 }
             }
         }

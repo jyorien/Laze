@@ -77,7 +77,7 @@ fun LoginScreen(navController: NavController?) {
                         mAuth.signInWithEmailAndPassword(inputEmail, inputPassword)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    // TODO log user in
+                                    navController!!.navigate("HomeScreen") { navController.popBackStack() }
                                 }
                                 else {
                                     task.exception?.let {
