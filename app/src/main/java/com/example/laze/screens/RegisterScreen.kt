@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun RegisterScreen(navController: NavController) {
     val mAuth = FirebaseAuth.getInstance()
+    val context = LocalContext.current
 
     var signUpEmail by remember { mutableStateOf("") }
     var signUpPass by remember { mutableStateOf("") }
@@ -102,9 +103,14 @@ fun RegisterScreen(navController: NavController) {
                         mAuth.createUserWithEmailAndPassword(signUpEmail, signUpPass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    // TODO success message
+                                    Toast.makeText(context, "User has been created!", Toast.LENGTH_SHORT).show()
+                                    signUpEmail = ""
+                                    signUpPass = ""
+                                    signUpCfmPass = ""
                                 } else {
-                                    // TODO failure message
+                                    task.exception?.let {
+                                        errorMessage = it.localizedMessage!!
+                                    }
                                 }
                             }
 

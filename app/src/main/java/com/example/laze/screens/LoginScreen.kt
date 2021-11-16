@@ -81,7 +81,7 @@ fun LoginScreen(navController: NavController?) {
                                 }
                                 else {
                                     task.exception?.let {
-                                        errorMessage = it.localizedMessage
+                                        errorMessage = it.localizedMessage!!
                                     }
                                 }
                             }
