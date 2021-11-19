@@ -1,5 +1,6 @@
 package com.example.laze.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -33,12 +34,17 @@ fun LoginScreen(navController: NavController?) {
     val mAuth = FirebaseAuth.getInstance()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-
+    val context = LocalContext.current
     var inputEmail by rememberSaveable { mutableStateOf("") }
     var inputPassword by rememberSaveable { mutableStateOf("") }
     var isEmailError by remember { mutableStateOf(false) }
     var isPassError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    if (context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE).getBoolean("SignedIn", false)) {
+        navController!!.navigate("HomeScreen") { navController.popBackStack() }
+        return
+    }
     Scaffold {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,6 +104,7 @@ fun LoginScreen(navController: NavController?) {
                         mAuth.signInWithEmailAndPassword(inputEmail, inputPassword)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    context.getSharedPreferences("SignedIn",Context.MODE_PRIVATE).edit().putBoolean("SignedIn", true).apply()
                                     navController!!.navigate("HomeScreen") { navController.popBackStack() }
                                 } else {
                                     task.exception?.let {
