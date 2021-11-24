@@ -1,12 +1,13 @@
 package com.example.laze.navigation
 
 import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.laze.screens.*
-import com.google.gson.Gson
 
 @Composable
 fun BottomNavigationHost(navController: NavHostController) {
@@ -22,9 +23,9 @@ fun BottomNavigationHost(navController: NavHostController) {
             "CapturedImageScreen/{img}",
             arguments = listOf(navArgument("img") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("img")?.let { json ->
-                val imageBitmap = Gson().fromJson(json, Bitmap::class.java)
-                CapturedImageScreen(imageBitmap)
+            backStackEntry.arguments?.getString("img")?.let { data ->
+                Log.d("hello","data $data")
+                CapturedImageScreen(data)
 
             }
         }
