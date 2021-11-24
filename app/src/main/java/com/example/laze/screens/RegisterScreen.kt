@@ -54,7 +54,7 @@ fun RegisterScreen(navController: NavController) {
                     modifier = Modifier.padding(10.dp)
                 ) {
                     Text(
-                        "Login",
+                        "Register",
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp,
                         modifier = Modifier.fillMaxWidth()
