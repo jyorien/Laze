@@ -80,7 +80,8 @@ fun CapturedImageScreen(imgUri: String) {
                 focusManager = focusManager,
                 focusRequester = focusRequester,
                 maxLines = 3,
-                singleLine = false
+                singleLine = false,
+                height = 150.dp
             )
             Spacer(Modifier.height(20.dp))
             Image(bitmap = bitmap.asImageBitmap(), contentDescription = "")

@@ -2,9 +2,7 @@ package com.example.laze.composables
 
 import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
@@ -35,7 +33,8 @@ fun InputTextField(
     focusManager: FocusManager,
     focusRequester: FocusRequester,
     maxLines: Int = 1,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    height: Dp = 50.dp
 
 ) {
     Box {
@@ -50,6 +49,8 @@ fun InputTextField(
             onValueChange = { inputValueOnChange(it) },
             modifier = Modifier
                 .padding(top = 10.dp)
+                .height(height)
+                .width(250.dp)
                 .focusRequester(focusRequester),
             visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
