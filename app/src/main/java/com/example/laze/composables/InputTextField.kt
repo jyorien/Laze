@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.laze.R
 
@@ -32,7 +33,10 @@ fun InputTextField(
     isVisible: Boolean,
     isError: Boolean,
     focusManager: FocusManager,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    maxLines: Int = 1,
+    singleLine: Boolean = true
+
 ) {
     Box {
         OutlinedTextField(
@@ -54,8 +58,8 @@ fun InputTextField(
                     "Error icon"
                 )
             },
-            singleLine = true,
-            maxLines = 1,
+            singleLine = singleLine,
+            maxLines = maxLines,
 
             )
         Box(modifier = Modifier.padding(bottom = 10.dp, start = 10.dp)) {

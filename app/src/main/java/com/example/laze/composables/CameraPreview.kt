@@ -31,9 +31,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.laze.R
-import com.google.gson.Gson
+import java.io.File
 import java.lang.Exception
 import java.nio.ByteBuffer
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 @Composable
 fun CameraPreview(
@@ -41,8 +43,7 @@ fun CameraPreview(
 ) {
     // ui states
     var isCameraAllowed by remember { mutableStateOf(false) }
-    var isBoundToCamera by remember { mutableStateOf(false) }
-
+    // context
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -94,7 +95,6 @@ fun CameraPreview(
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner, cameraSelector, preview, imageCapture
                         )
-                        isBoundToCamera = true
                     } catch (exc: Exception) {
                         Log.d("hello", "Use case binding failed", exc)
                     }
@@ -109,20 +109,35 @@ fun CameraPreview(
                     .padding(vertical = 80.dp)
             ) {
                 FloatingActionButton(onClick = {
-                    // take a picture
-                    imageCapture.takePicture(ContextCompat.getMainExecutor(context), object : ImageCapture.OnImageCapturedCallback() {
-                        override fun onCaptureSuccess(image: ImageProxy) {
-                            super.onCaptureSuccess(image)
-                            val img = Gson().toJson(imageProxyToBitmap(image))
-                            Log.d("hello", "image captured")
-                            navController.navigate("CapturedImageScreen/$img")
+                    val file = File(getOutputDirectory(context), System.currentTimeMillis().toString() + ".jpg")
+                    val outputFileOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+                    imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(context), object: ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                            val imgUri = outputFileResults.savedUri.toString().replace("/","*")
+                            Log.d("hello", "imgUri $imgUri")
+                            navController.navigate("CapturedImageScreen/$imgUri")
                         }
 
                         override fun onError(exception: ImageCaptureException) {
-                            super.onError(exception)
-                            Log.d("hello", exception.localizedMessage!!)
+                            Log.d("hello",exception.localizedMessage!!)
                         }
+
                     })
+                    // take a picture
+//                    imageCapture.takePicture(ContextCompat.getMainExecutor(context), object : ImageCapture.OnImageCapturedCallback() {
+//                        override fun onCaptureSuccess(image: ImageProxy) {
+//                            super.onCaptureSuccess(image)
+//                            val img = Gson().toJson(imageProxyToBitmap(image))
+//                            Log.d("hello", "image captured")
+//                            navController.navigate("CapturedImageScreen/$img")
+//
+//                        }
+//
+//                        override fun onError(exception: ImageCaptureException) {
+//                            super.onError(exception)
+//                            Log.d("hello", exception.localizedMessage!!)
+//                        }
+//                    })
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_camera_alt_24),
@@ -140,4 +155,12 @@ private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
     val bytes = ByteArray(buffer.remaining())
     buffer.get(bytes)
     return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+}
+
+private fun getOutputDirectory(ctx: Context) : File {
+    val mediaDir = ctx.externalMediaDirs.firstOrNull()?.let {
+        File(it, ctx.resources.getString(R.string.app_name)).apply { mkdirs() }
+    }
+    return if (mediaDir != null && mediaDir.exists()) mediaDir else ctx.filesDir
+
 }
