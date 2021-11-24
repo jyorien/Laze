@@ -41,8 +41,8 @@ fun CameraPreview(
 ) {
     // ui states
     var isCameraAllowed by remember { mutableStateOf(false) }
-    var isBoundToCamera by remember { mutableStateOf(false) }
 
+    // context
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -94,7 +94,6 @@ fun CameraPreview(
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner, cameraSelector, preview, imageCapture
                         )
-                        isBoundToCamera = true
                     } catch (exc: Exception) {
                         Log.d("hello", "Use case binding failed", exc)
                     }
