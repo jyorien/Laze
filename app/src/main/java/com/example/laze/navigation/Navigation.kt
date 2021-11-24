@@ -25,7 +25,7 @@ fun BottomNavigationHost(navController: NavHostController) {
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("img")?.let { data ->
                 Log.d("hello","data $data")
-                CapturedImageScreen(data)
+                CapturedImageScreen(data, navController)
 
             }
         }
