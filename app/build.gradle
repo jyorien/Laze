@@ -75,6 +75,12 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.1.0-alpha10"
     implementation "androidx.camera:camera-view:1.0.0-alpha30"
 
-    // flow
+    // flow & coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC'
+
+    // coil
+    implementation("io.coil-kt:coil-compose:1.3.2")
+
+    // firebase coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
 }
