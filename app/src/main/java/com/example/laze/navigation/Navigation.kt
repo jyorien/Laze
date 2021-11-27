@@ -7,13 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.laze.data.MainViewModel
 import com.example.laze.screens.*
 
 @Composable
-fun BottomNavigationHost(navController: NavHostController) {
+fun BottomNavigationHost(navController: NavHostController, viewModel: MainViewModel) {
     NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
         // bottom nav routes
-        composable("ViewPostScreen") { ViewPostScreen() }
+        composable("ViewPostScreen") { ViewPostScreen(viewModel) }
         composable("AddPostScreen") { AddPostScreen(navController) }
         composable("ChatListScreen") { ChatListScreen() }
         composable("UserPostListScreen") { UserPostListScreen() }
