@@ -1,6 +1,9 @@
 package com.example.laze.screens
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,39 +11,71 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
+import com.example.laze.R
 import com.example.laze.composables.Pager
+import com.example.laze.data.MainViewModel
+import com.example.laze.data.OnError
+import com.example.laze.data.OnSuccess
+import com.example.laze.data.Post
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
-fun ViewPostScreen() {
-    val items = listOf(
-        Color.Red,
-        Color.Blue,
-        Color.Green,
-        Color.Yellow,
-        Color.Cyan,
-        Color.Magenta
-    )
-    Pager(
-        items = items,
+fun ViewPostScreen(viewModel: MainViewModel) {
+    val storage = FirebaseStorage.getInstance()
+    when (val posts = viewModel.postsStateFlow.asStateFlow().collectAsState().value) {
+        is OnError -> {
+            Text(text = "Posts couldn't load")
+        }
+
+        is OnSuccess -> {
+            val postsList = mutableListOf<Post>()
+            runBlocking {
+                val data = posts.querySnapshot?.documents?.forEach { document ->
+                    val data = document.data
+                    data?.let {
+                        val url = storage.getReference("/${data["imageUrl"]}").downloadUrl.await()
+                        val post = Post("Joye", data["description"].toString(),url.toString())
+                        postsList.add(post)
+                    }
+
+
+                }
+                Log.d("hello","success data $data")
+            }
+
+
+                Pager(
+        items = postsList,
         modifier = Modifier.fillMaxSize(), orientation = Orientation.Vertical,
-        itemSpacing = 16.dp,
         contentFactory = { item ->
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(item),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = item.toString(),
-                    modifier = Modifier.padding(all = 16.dp),
-                    style = MaterialTheme.typography.h6,
-                )
+                Image(painter = rememberImagePainter(data = item.imageUrl, builder = { placeholder(R.drawable.sample_placeholder) }), contentDescription = "Image", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             }
         }
     )
+        }
+
+    }
+
 }

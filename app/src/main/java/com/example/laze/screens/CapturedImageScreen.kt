@@ -55,7 +55,7 @@ fun CapturedImageScreen(imgUri: String, navController: NavController) {
             firestorage.child(storagePath).putFile(Uri.fromFile(imgFile))
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val data = mapOf("description" to descText, "imageUrl" to storagePath)
+                        val data = mapOf("description" to descText, "imageUrl" to storagePath, "name" to auth.currentUser!!.displayName)
 
                         // save to firestore
                         firestore.collection("users").document(auth.currentUser!!.uid)
