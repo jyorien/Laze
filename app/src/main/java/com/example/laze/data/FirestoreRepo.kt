@@ -17,7 +17,7 @@ class FirestoreRepo {
 
         var collection: CollectionReference? = null
         try {
-            collection = firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads")
+            collection = firestore.collection("uploads")
         } catch (e: Throwable) {
             close(e)
         }

@@ -53,26 +53,34 @@ fun CapturedImageScreen(imgUri: String, navController: NavController) {
             val storagePath = auth.currentUser!!.uid + "?" + System.currentTimeMillis()
             // save to firebase storage
             firestorage.child(storagePath).putFile(Uri.fromFile(imgFile))
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                .addOnCompleteListener { task1 ->
+                    if (task1.isSuccessful) {
                         val data = mapOf("description" to descText, "imageUrl" to storagePath, "name" to auth.currentUser!!.displayName)
 
-                        // save to firestore
+                        // save to personal firestore collection
                         firestore.collection("users").document(auth.currentUser!!.uid)
-                            .collection("uploads").add(data).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    Log.d("hello", "Upload success: ${task.result}")
-                                    coroutineScope.launch {
-                                        val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(message = "Successfully posted", duration = SnackbarDuration.Short)
-                                        if (snackbarResult == SnackbarResult.Dismissed) navigateBackHome(navController)
-                                    }
+                            .collection("uploads").add(data).addOnCompleteListener { task2 ->
+                                if (task2.isSuccessful) {
+                                    // save to general firestore collection
+                                    firestore.collection("uploads").add(data).addOnCompleteListener { task3 ->
+                                        if (task3.isSuccessful) {
+                                            Log.d("hello", "Upload success: ${task2.result}")
+                                            Log.d("hello", "Upload success: ${task3.result}")
+                                            coroutineScope.launch {
+                                                val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(message = "Successfully posted", duration = SnackbarDuration.Short)
+                                                if (snackbarResult == SnackbarResult.Dismissed) navigateBackHome(navController)
+                                            }
+                                        } else {
+                                            Log.e("hello","Error uploading to firestore: ${task3.exception!!.message}")
+                                        }
 
+                                    }
                                 } else {
-                                    Log.e("hello", "Error uploading to firestore: ${task.exception!!.message}" )
+                                    Log.e("hello", "Error uploading to firestore: ${task2.exception!!.message}" )
                                 }
                             }
                     } else {
-                        Log.e("hello", "Error uploading file to storage: ${task.exception}")
+                        Log.e("hello", "Error uploading file to storage: ${task1.exception}")
                     }
                 }
         }, Modifier.padding(bottom = 60.dp)) {

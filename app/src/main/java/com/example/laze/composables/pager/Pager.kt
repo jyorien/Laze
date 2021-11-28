@@ -38,7 +38,7 @@ fun <T : Any> Pager(
     contentFactory: @Composable (T) -> Unit
 ) {
     // check fractions are within range & selected index within bounds
-    require(initialIndex in 0..items.lastIndex) { "Initial index out of bounds" }
+//    require(initialIndex in 0..items.lastIndex) { "Initial index out of bounds" }
     require(itemFraction > 0f && itemFraction <= 1f) { "Item fraction must be in the (0f, 1f) range" }
     require(overshootFraction > 0f && itemFraction <= 1f) { "Overshoot fraction must be in the (0f, 1f) range" }
     val scope = rememberCoroutineScope()

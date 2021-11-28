@@ -52,7 +52,7 @@ fun ViewPostScreen(viewModel: MainViewModel) {
                     val data = document.data
                     data?.let {
                         val url = storage.getReference("/${data["imageUrl"]}").downloadUrl.await()
-                        val post = Post("Joye", data["description"].toString(),url.toString())
+                        val post = Post(data["name"].toString(), data["description"].toString(),url.toString())
                         postsList.add(post)
                     }
 
