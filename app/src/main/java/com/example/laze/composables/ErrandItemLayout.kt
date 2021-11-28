@@ -17,7 +17,8 @@ import com.example.laze.data.Post
 fun ErrandItemLayout(post: Post, onClick: (Post) -> Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()
-        .height(100.dp)
+        .height(130.dp)
+        .padding(vertical = 4.dp)
         .border(width = 1.dp, color = Color.Black).clickable(enabled = true, onClick = {
             onClick(post)
         }),

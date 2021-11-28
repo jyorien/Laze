@@ -76,7 +76,7 @@ fun ViewPostScreen(viewModel: MainViewModel) {
                     .fillMaxWidth()
                     .align(Alignment.BottomStart)
                     .padding(20.dp)
-                    .height(250.dp) ) {
+                    .height(190.dp) ) {
                     Column {
                         Text(text = item.username, color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(20.dp))

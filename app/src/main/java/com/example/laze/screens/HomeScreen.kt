@@ -1,8 +1,12 @@
 package com.example.laze.screens
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.laze.data.MainViewModel
@@ -16,6 +20,9 @@ fun HomeScreen(viewModel: MainViewModel) {
     Scaffold(
         bottomBar = { BottomNavigationBar(bottomNavController) }
     ) {
-        BottomNavigationHost(bottomNavController, viewModel)
+        Log.d("hello","padding $it")
+        Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding())) {
+            BottomNavigationHost(bottomNavController, viewModel)
+        }
     }
 }
