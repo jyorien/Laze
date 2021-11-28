@@ -83,4 +83,8 @@ dependencies {
 
     // firebase coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
+
+    // Accompanist
+    implementation "com.google.accompanist:accompanist-pager:0.19.0" // Pager
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.19.0" // Pager Indicators
 }
