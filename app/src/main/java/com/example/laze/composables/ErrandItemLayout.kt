@@ -26,7 +26,7 @@ fun ErrandItemLayout(post: Post, onClick: (Post) -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
             Text(text = post.description)
-            Text(text = "Assigned to @joey", textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+            Text(text = "Assigned to @${post.username}", textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
 
         }
 
