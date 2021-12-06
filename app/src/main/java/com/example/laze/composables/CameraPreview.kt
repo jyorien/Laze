@@ -106,7 +106,7 @@ fun CameraPreview(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(vertical = 80.dp)
+                    .padding(vertical = 40.dp)
             ) {
                 FloatingActionButton(onClick = {
                     val file = File(getOutputDirectory(context), System.currentTimeMillis().toString() + ".jpg")

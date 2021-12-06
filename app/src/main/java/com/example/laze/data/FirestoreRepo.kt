@@ -13,6 +13,7 @@ class FirestoreRepo {
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
+    // get all posts uploaded to firebase
     fun getPostDetails() = callbackFlow {
 
         var collection: CollectionReference? = null
@@ -32,5 +33,26 @@ class FirestoreRepo {
         }
 
         awaitClose { subscription?.remove() }
+    }
+
+    // gets posts that belong to current user
+    fun getUserPosts() = callbackFlow {
+        var collection: CollectionReference? = null
+        try {
+            collection = firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads")
+        } catch (e: Throwable) {
+            Log.e("hello","Failed to get user posts ${e.localizedMessage}")
+            close(e)
+        }
+
+        val subscription = collection?.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                OnSuccess(value)
+            } else {
+                OnError(error)
+            }
+            trySend(response)
+        }
+        awaitClose { subscription?.remove()}
     }
 }
