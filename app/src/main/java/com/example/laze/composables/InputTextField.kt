@@ -34,7 +34,7 @@ fun InputTextField(
     focusRequester: FocusRequester,
     maxLines: Int = 1,
     singleLine: Boolean = true,
-    height: Dp = 50.dp
+    height: Dp = 60.dp
 
 ) {
     Box {

@@ -39,7 +39,7 @@ class FirestoreRepo {
     fun getUserPosts() = callbackFlow {
         var collection: CollectionReference? = null
         try {
-            collection = firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads")
+            collection = auth.currentUser?.uid?.let { firestore.collection("users").document(it).collection("uploads") }
         } catch (e: Throwable) {
             Log.e("hello","Failed to get user posts ${e.localizedMessage}")
             close(e)

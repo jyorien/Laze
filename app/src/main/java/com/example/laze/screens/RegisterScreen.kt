@@ -1,5 +1,6 @@
 package com.example.laze.screens
 
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -23,6 +24,8 @@ import com.example.laze.composables.AppLogo
 import com.example.laze.composables.InputTextField
 import com.example.laze.composables.SquareBox
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -31,6 +34,7 @@ fun RegisterScreen(navController: NavController) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
 
+    var signUpUsername by remember { mutableStateOf("")}
     var signUpEmail by remember { mutableStateOf("") }
     var signUpPass by remember { mutableStateOf("") }
     var signUpCfmPass by remember { mutableStateOf("") }
@@ -60,6 +64,15 @@ fun RegisterScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Box(Modifier.height(10.dp))
+                    InputTextField(
+                        inputValue = signUpUsername,
+                        inputValueOnChange = {signUpUsername = it},
+                        label = "Username",
+                        isVisible = true,
+                        isError = false,
+                        focusManager = focusManager,
+                        focusRequester = focusRequester
+                    )
                     InputTextField(
                         inputValue = signUpEmail,
                         inputValueOnChange = {
@@ -102,7 +115,7 @@ fun RegisterScreen(navController: NavController) {
                         isPassError = false
                         isCfmPassError = false
                         isGeneralError = false
-                        if (signUpEmail.isEmpty() || signUpPass.isEmpty() || signUpCfmPass.isEmpty()) {
+                        if (signUpEmail.isEmpty() || signUpPass.isEmpty() || signUpCfmPass.isEmpty() || signUpUsername.isEmpty()) {
                             isGeneralError = true
                             errorMessage = "Fields cannot be empty"
                             return@Button
@@ -124,11 +137,14 @@ fun RegisterScreen(navController: NavController) {
                         mAuth.createUserWithEmailAndPassword(signUpEmail, signUpPass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    Log.d("hello","current email ${mAuth.currentUser?.email}")
+                                    mAuth.currentUser?.updateProfile(userProfileChangeRequest { displayName = signUpUsername.trim() })
                                     Toast.makeText(
                                         context,
                                         "User has been created!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    signUpUsername = ""
                                     signUpEmail = ""
                                     signUpPass = ""
                                     signUpCfmPass = ""
