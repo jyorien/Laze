@@ -55,4 +55,9 @@ class FirestoreRepo {
         }
         awaitClose { subscription?.remove()}
     }
+
+    // deletes a document
+    fun deleteUserPost() {
+
+    }
 }

@@ -59,10 +59,10 @@ fun CapturedImageScreen(imgUri: String, navController: NavController) {
 
                         // save to personal firestore collection
                         firestore.collection("users").document(auth.currentUser!!.uid)
-                            .collection("uploads").add(data).addOnCompleteListener { task2 ->
+                            .collection("uploads").document(storagePath).set(data).addOnCompleteListener { task2 ->
                                 if (task2.isSuccessful) {
                                     // save to general firestore collection
-                                    firestore.collection("uploads").add(data).addOnCompleteListener { task3 ->
+                                    firestore.collection("uploads").document(storagePath).set(data).addOnCompleteListener { task3 ->
                                         if (task3.isSuccessful) {
                                             Log.d("hello", "Upload success: ${task2.result}")
                                             Log.d("hello", "Upload success: ${task3.result}")
