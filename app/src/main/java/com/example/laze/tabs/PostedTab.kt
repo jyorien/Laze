@@ -1,10 +1,7 @@
 package com.example.laze.tabs
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -46,7 +43,7 @@ fun PostedTab() {
                         val post = Post(username = it["name"].toString(), description = it["description"].toString(), imageUrl = it["imageUrl"].toString())
                         postsList.add(post)
                     }
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
                         LazyColumn() {
                             items(postsList) { currentPost ->
                                 ErrandItemLayout(post = currentPost, onClick = {
@@ -54,6 +51,8 @@ fun PostedTab() {
                                     val splitUrl = currentPost.imageUrl.split("?")
                                     val postDetails = "${currentPost.username}$${currentPost.description}$${splitUrl[0]}$${splitUrl[1]}"
                                     navController.navigate("Detail/$postDetails")
+                                }, onDelete = {
+
                                 })
                             }
                         }
