@@ -57,7 +57,34 @@ class FirestoreRepo {
     }
 
     // deletes a document
-    fun deleteUserPost() {
+    fun deleteUserPost(imageName: String) = callbackFlow {
+        firestore.collection("uploads").document(imageName).delete().addOnCompleteListener {
+            if (it.isSuccessful) {
+                if (auth.currentUser?.uid?.isNullOrEmpty() == true)  {
+                    trySend(-1)
+                    return@addOnCompleteListener
+                }
+                firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads").document(imageName).delete().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        storage.getReference(imageName).delete().addOnCompleteListener { task2 ->
+                            if (task2.isSuccessful) {
+                                trySend(400)
 
+                            } else {
+                                Log.e("hello","Failed to delete image from firebase storage: ${task2.exception}")
+                                trySend(-1)
+                            }
+                        }
+                    } else {
+                        Log.e("hello","Failed to delete from users/uploads: ${task.exception}")
+                        trySend(-1)
+                    }
+                }
+
+            } else {
+                Log.e("hello","Couldn't delete document from uploads: ${it.exception}")
+            }
+        }
+        awaitClose()
     }
 }

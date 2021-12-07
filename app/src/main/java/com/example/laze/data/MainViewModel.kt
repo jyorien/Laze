@@ -11,7 +11,7 @@ class MainViewModel : ViewModel(){
     val repo = FirestoreRepo()
     val postsStateFlow = MutableStateFlow<FireResponse?>(null)
     val userPostsStateFlow = MutableStateFlow<FireResponse?>(null)
-
+    val deleteStateFlow = MutableStateFlow(0)
 
     init {
         viewModelScope.launch {
@@ -25,5 +25,14 @@ class MainViewModel : ViewModel(){
                 userPostsStateFlow.value = it
             }
         }
+    }
+
+    fun deletePost(imagePath: String) {
+        viewModelScope.launch {
+            repo.deleteUserPost(imagePath).collect {
+                deleteStateFlow.value = it
+            }
+        }
+
     }
 }

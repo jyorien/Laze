@@ -1,12 +1,14 @@
 package com.example.laze.tabs
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -26,7 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 fun PostedTab() {
     val viewModel = viewModel<MainViewModel>()
     Log.d("hello","Posted Tab")
-
+    val context = LocalContext.current
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "Start") {
         composable("Detail/{data}", arguments = listOf(navArgument("data") {type = NavType.StringType})) { backStackEntry ->
@@ -43,7 +45,9 @@ fun PostedTab() {
                         val post = Post(username = it["name"].toString(), description = it["description"].toString(), imageUrl = it["imageUrl"].toString())
                         postsList.add(post)
                     }
-                    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp)) {
                         LazyColumn() {
                             items(postsList) { currentPost ->
                                 ErrandItemLayout(post = currentPost, onClick = {
@@ -52,8 +56,16 @@ fun PostedTab() {
                                     val postDetails = "${currentPost.username}$${currentPost.description}$${splitUrl[0]}$${splitUrl[1]}"
                                     navController.navigate("Detail/$postDetails")
                                 }, onDelete = {
-
+                                    viewModel.deletePost(currentPost.imageUrl)
                                 })
+                            }
+                        }
+                        when (viewModel.deleteStateFlow.asStateFlow().collectAsState().value) {
+                            400 -> {
+                                Toast.makeText(context, "Successfully deleted post", Toast.LENGTH_SHORT).show()
+                            }
+                            -1 -> {
+                                Toast.makeText(context, "Oops! Something went wrong", Toast.LENGTH_SHORT).show()
                             }
                         }
 
