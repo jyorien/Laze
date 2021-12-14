@@ -19,56 +19,74 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.laze.composables.CurrentUserChatBubble
 import com.example.laze.composables.InputTextField
 import com.example.laze.composables.OtherUserChatBubble
+import com.example.laze.data.MainViewModel
+import com.example.laze.data.OnChatError
+import com.example.laze.data.OnChatSuccess
 import com.example.laze.data.SentText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
-fun PrivateChatScreen(userId: String, navController: NavController) {
-    val auth = FirebaseAuth.getInstance()
-    val chatList = listOf(
-        SentText("Hello there~!", "asd"),
-        SentText("Hello there~!", userId)
-    )
+fun PrivateChatScreen(userId: String, navController: NavController, viewModel: MainViewModel) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     var textToSend by rememberSaveable { mutableStateOf("") }
-
     Scaffold {
-        Column() {
-            LazyColumn(
-                verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier.fillMaxWidth().height(550.dp)
-            ) {
+        when (val documents = viewModel.messagesList.asStateFlow().collectAsState().value) {
+            is OnChatError -> {
+                Text("Oops, something went wrong.")
+                Log.d("hello","wrong")
+            }
 
-                items(chatList) { singleText ->
-                    if (singleText.senderUid == userId) {
-                        CurrentUserChatBubble(currentUserText = singleText.text)
-                    } else {
-                        OtherUserChatBubble(currentUserText = singleText.text)
+            is OnChatSuccess -> {
+                val messages = mutableListOf<SentText>()
+                documents.data.forEach { documentSnapshot ->
+                    messages.add(SentText(documentSnapshot["message"].toString(), documentSnapshot["senderId"].toString()))
+                }
+                Column {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.Bottom,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(550.dp)
+                    ) {
+
+                        items(messages) { singleText ->
+                            if (singleText.senderUid == userId) {
+                                CurrentUserChatBubble(currentUserText = singleText.text)
+                            } else {
+                                OtherUserChatBubble(currentUserText = singleText.text)
+                            }
+                        }
+                    }
+                    // input row
+                    Row(modifier = Modifier
+                        .fillMaxSize()
+                        .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(2.dp)), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+                        InputTextField(
+                            inputValue = textToSend,
+                            inputValueOnChange = { textToSend = it },
+                            label = "Text",
+                            isVisible = true,
+                            isError = false,
+                            focusManager = focusManager,
+                            focusRequester = focusRequester
+                        )
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(text = "SEND")
+                        }
                     }
                 }
             }
-            Row(modifier = Modifier.fillMaxSize().border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(2.dp)), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
-                InputTextField(
-                    inputValue = textToSend,
-                    inputValueOnChange = { textToSend = it },
-                    label = "Text",
-                    isVisible = true,
-                    isError = false,
-                    focusManager = focusManager,
-                    focusRequester = focusRequester
-                )
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "SEND")
-                }
-            }
         }
+
 
 
     }

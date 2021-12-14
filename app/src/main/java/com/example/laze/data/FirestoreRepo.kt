@@ -87,4 +87,18 @@ class FirestoreRepo {
         }
         awaitClose()
     }
+
+    // get current chat updates
+    fun subscribeToMessages(ref: CollectionReference) = callbackFlow {
+        val subscription = ref.addSnapshotListener { value, error ->
+         val response = if (error == null) {
+             value?.documents?.let { OnChatSuccess(it) }
+         } else {
+             OnChatError(error)
+         }
+            trySend(response)
+
+        }
+        awaitClose { subscription.remove()}
+        }
 }

@@ -32,7 +32,7 @@ fun UserPostDetailScreen(data: String, navController: NavController) {
     runBlocking {
         Log.d("hello","img $imgUrl")
         val url = storage.getReference("/${imgUrl}").downloadUrl.await()
-        post = Post(dataList[0], dataList[1], url.toString(),"")
+        post = Post(dataList[0], dataList[1], url.toString(),"","")
     }
 
     Scaffold() {

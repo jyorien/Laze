@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -35,6 +36,7 @@ import com.example.laze.data.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +46,8 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
     val storage = FirebaseStorage.getInstance()
+    val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
     when (val posts = viewModel.postsStateFlow.asStateFlow().collectAsState().value) {
         is OnError -> {
             Text(text = "Posts couldn't load")
@@ -57,13 +61,12 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
                     data?.let {
                         val url = storage.getReference("/${data["imageUrl"]}").downloadUrl.await()
                         val userId = data["imageUrl"].toString().split("?")[0]
-                        val post = Post(data["name"].toString(), data["description"].toString(),url.toString(), userId)
+                        val post = Post(data["name"].toString(), data["description"].toString(),url.toString(), userId, data["imageUrl"].toString())
                         postsList.add(post)
                     }
 
 
                 }
-                Log.d("hello","success data $data")
             }
 
 
@@ -93,6 +96,13 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
                             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
                                 Icon(painter = painterResource(id = R.drawable.ic_baseline_chat_bubble_24), contentDescription = "Chat with User button", modifier = Modifier.clickable {
                                     val userId = item.userId
+                                    val collection =
+                                        auth.currentUser?.uid?.let { uid ->
+                                            firestore.collection("users").document(uid).collection("chats").document("${item.rawImageRef}?$uid").collection("messages")
+                                        }
+                                    if (collection != null) {
+                                        viewModel.subscribeToMessageThread(collection)
+                                    }
                                     navController.navigate("PrivateChatScreen/$userId")
                                 })
                             }

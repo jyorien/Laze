@@ -34,7 +34,7 @@ fun BottomNavigationHost(navController: NavHostController, viewModel: MainViewMo
         }
         composable("PrivateChatScreen/{userId}", arguments = listOf(navArgument("userId") {type = NavType.StringType})) { backStackEntry ->
             backStackEntry.arguments?.getString("userId")?.let { data ->
-                PrivateChatScreen(data, navController)
+                PrivateChatScreen(data, navController, viewModel)
             }
         }
     }
