@@ -17,8 +17,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.laze.data.MainViewModel
 import com.example.laze.screens.*
 import com.example.laze.ui.theme.LazeTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)

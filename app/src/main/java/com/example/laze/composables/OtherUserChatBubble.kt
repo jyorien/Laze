@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -14,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun OtherUserChatBubble(currentUserText: String) {
-    Box(Modifier.padding(16.dp)) {
+    Row(Modifier.padding(16.dp).fillMaxWidth()) {
         Column(
             modifier = Modifier.background(
                 color = Color(37,45,49),
