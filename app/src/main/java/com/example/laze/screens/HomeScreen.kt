@@ -22,7 +22,6 @@ fun HomeScreen(viewModel: MainViewModel) {
     Scaffold(
         bottomBar = { BottomNavigationBar(bottomNavController) }
     ) {
-        Log.d("hello","padding $it")
         Box(modifier = Modifier.padding(bottom = it.calculateBottomPadding())) {
             BottomNavigationHost(bottomNavController, viewModel)
         }
