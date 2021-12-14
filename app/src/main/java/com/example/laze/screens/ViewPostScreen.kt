@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,10 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.example.laze.R
@@ -38,7 +42,7 @@ import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun ViewPostScreen(viewModel: MainViewModel) {
+fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
     val storage = FirebaseStorage.getInstance()
     when (val posts = viewModel.postsStateFlow.asStateFlow().collectAsState().value) {
         is OnError -> {
@@ -76,11 +80,21 @@ fun ViewPostScreen(viewModel: MainViewModel) {
                     .fillMaxWidth()
                     .align(Alignment.BottomStart)
                     .padding(20.dp)
-                    .height(190.dp) ) {
-                    Column {
-                        Text(text = item.username, color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Text(text = item.description, color = Color.White)
+                    .height(190.dp)) {
+                    Column(Modifier.fillMaxWidth()) {
+                        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column() {
+                                Text(text = item.username, color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Text(text = item.description, color = Color.White)
+                            }
+
+                            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
+                                Icon(painter = painterResource(id = R.drawable.ic_baseline_chat_bubble_24), contentDescription = "Chat with User button", modifier = Modifier.clickable {
+                                    navController.navigate("PrivateChatScreen/hello")
+                                })
+                            }
+                        }
                     }
 
                 }
