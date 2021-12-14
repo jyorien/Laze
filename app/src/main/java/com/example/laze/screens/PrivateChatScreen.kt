@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun PrivateChatScreen(userId: String, navController: NavController) {
+    Log.d("hello","user id $userId")
     Scaffold() {
 
     }

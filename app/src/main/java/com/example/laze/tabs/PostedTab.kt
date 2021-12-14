@@ -42,7 +42,7 @@ fun PostedTab() {
                 is OnSuccess -> {
                     val postsList = mutableListOf<Post>()
                     posts.querySnapshot?.documents?.forEach {
-                        val post = Post(username = it["name"].toString(), description = it["description"].toString(), imageUrl = it["imageUrl"].toString())
+                        val post = Post(username = it["name"].toString(), description = it["description"].toString(), imageUrl = it["imageUrl"].toString(), userId = it["imageUel"].toString().split(("?"))[0])
                         postsList.add(post)
                     }
                     Column(modifier = Modifier

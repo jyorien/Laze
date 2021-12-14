@@ -43,6 +43,6 @@ fun ErrandItemLayout(post: Post, onClick: (Post) -> Unit, onDelete: (Post) -> Un
 @Preview(showBackground = true)
 @Composable
 fun PreviewErrand() {
-    val post = Post(username = "Joey", description = "Looking for someone to help me with...", "asdf")
+    val post = Post(username = "Joey", description = "Looking for someone to help me with...", "asdf","")
     ErrandItemLayout(post, {}, {})
 }

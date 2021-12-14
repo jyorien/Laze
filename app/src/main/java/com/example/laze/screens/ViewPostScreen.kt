@@ -56,7 +56,8 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
                     val data = document.data
                     data?.let {
                         val url = storage.getReference("/${data["imageUrl"]}").downloadUrl.await()
-                        val post = Post(data["name"].toString(), data["description"].toString(),url.toString())
+                        val userId = data["imageUrl"].toString().split("?")[0]
+                        val post = Post(data["name"].toString(), data["description"].toString(),url.toString(), userId)
                         postsList.add(post)
                     }
 
@@ -91,7 +92,8 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
 
                             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
                                 Icon(painter = painterResource(id = R.drawable.ic_baseline_chat_bubble_24), contentDescription = "Chat with User button", modifier = Modifier.clickable {
-                                    navController.navigate("PrivateChatScreen/hello")
+                                    val userId = item.userId
+                                    navController.navigate("PrivateChatScreen/$userId")
                                 })
                             }
                         }
