@@ -56,7 +56,7 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
         is OnSuccess -> {
             val postsList = mutableListOf<Post>()
             runBlocking {
-                val data = posts.querySnapshot?.documents?.forEach { document ->
+                posts.querySnapshot?.documents?.forEach { document ->
                     val data = document.data
                     data?.let {
                         val url = storage.getReference("/${data["imageUrl"]}").downloadUrl.await()
@@ -98,12 +98,21 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
                                     val userId = item.userId
                                     val collection =
                                         auth.currentUser?.uid?.let { uid ->
+                                            // add participants in documents
+                                            val senderRef = firestore.collection("users").document(uid).collection("chats").document("${item.rawImageRef}?$uid")
+                                            val receiverRef = firestore.collection("users").document(userId).collection("chats").document("${item.rawImageRef}?$uid")
+                                            viewModel.setParticipants(userId, item.username, senderRef, uid, auth.currentUser!!.displayName.toString(), receiverRef)
                                             firestore.collection("users").document(uid).collection("chats").document("${item.rawImageRef}?$uid").collection("messages")
+
+
                                         }
+
+
                                     if (collection != null) {
                                         viewModel.subscribeToMessageThread(collection)
                                     }
-                                    navController.navigate("PrivateChatScreen/$userId")
+                                    val imageId = item.rawImageRef.split("?")[1]
+                                    navController.navigate("PrivateChatScreen/$userId/$imageId")
                                 })
                             }
                         }

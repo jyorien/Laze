@@ -34,10 +34,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
-fun PrivateChatScreen(userId: String, navController: NavController, viewModel: MainViewModel) {
+fun PrivateChatScreen(userId: String, rawImageRef: String, navController: NavController, viewModel: MainViewModel) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     var textToSend by rememberSaveable { mutableStateOf("") }
+    val firestore = FirebaseFirestore.getInstance()
+    val auth = FirebaseAuth.getInstance()
+    val currentUserId = auth.currentUser?.uid
     Scaffold {
         when (val documents = viewModel.messagesList.asStateFlow().collectAsState().value) {
             is OnChatError -> {
@@ -59,7 +62,7 @@ fun PrivateChatScreen(userId: String, navController: NavController, viewModel: M
                     ) {
 
                         items(messages) { singleText ->
-                            if (singleText.senderUid == userId) {
+                            if (singleText.senderUid != userId) {
                                 CurrentUserChatBubble(currentUserText = singleText.text)
                             } else {
                                 OtherUserChatBubble(currentUserText = singleText.text)
@@ -79,7 +82,17 @@ fun PrivateChatScreen(userId: String, navController: NavController, viewModel: M
                             focusManager = focusManager,
                             focusRequester = focusRequester
                         )
-                        Button(onClick = { /*TODO*/ }) {
+                        Button(onClick = {
+                            val senderRef =
+                                currentUserId?.let { currentId ->
+                                    firestore.collection("users").document(currentId).collection("chats").document("$userId?$rawImageRef?${currentId}").collection("messages")
+                                }
+                            val receiverRef = firestore.collection("users").document(userId).collection("chats").document("$userId?$rawImageRef?$currentUserId").collection("messages")
+                            Log.d("hello","sender ref ${senderRef!!.path}")
+                            Log.d("hello","receiver ref ${receiverRef.path}")
+                            viewModel.sendText(textToSend, receiverRef, senderRef!!)
+
+                        }) {
                             Text(text = "SEND")
                         }
                     }

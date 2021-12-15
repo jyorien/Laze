@@ -3,6 +3,7 @@ package com.example.laze.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
@@ -39,9 +40,11 @@ class FirestoreRepo {
     fun getUserPosts() = callbackFlow {
         var collection: CollectionReference? = null
         try {
-            collection = auth.currentUser?.uid?.let { firestore.collection("users").document(it).collection("uploads") }
+            collection = auth.currentUser?.uid?.let {
+                firestore.collection("users").document(it).collection("uploads")
+            }
         } catch (e: Throwable) {
-            Log.e("hello","Failed to get user posts ${e.localizedMessage}")
+            Log.e("hello", "Failed to get user posts ${e.localizedMessage}")
             close(e)
         }
 
@@ -53,36 +56,41 @@ class FirestoreRepo {
             }
             trySend(response)
         }
-        awaitClose { subscription?.remove()}
+        awaitClose { subscription?.remove() }
     }
 
     // deletes a document
     fun deleteUserPost(imageName: String) = callbackFlow {
         firestore.collection("uploads").document(imageName).delete().addOnCompleteListener {
             if (it.isSuccessful) {
-                if (auth.currentUser?.uid?.isNullOrEmpty() == true)  {
+                if (auth.currentUser?.uid?.isNullOrEmpty() == true) {
                     trySend(-1)
                     return@addOnCompleteListener
                 }
-                firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads").document(imageName).delete().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        storage.getReference(imageName).delete().addOnCompleteListener { task2 ->
-                            if (task2.isSuccessful) {
-                                trySend(400)
+                firestore.collection("users").document(auth.currentUser!!.uid).collection("uploads")
+                    .document(imageName).delete().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            storage.getReference(imageName).delete()
+                                .addOnCompleteListener { task2 ->
+                                    if (task2.isSuccessful) {
+                                        trySend(400)
 
-                            } else {
-                                Log.e("hello","Failed to delete image from firebase storage: ${task2.exception}")
-                                trySend(-1)
-                            }
+                                    } else {
+                                        Log.e(
+                                            "hello",
+                                            "Failed to delete image from firebase storage: ${task2.exception}"
+                                        )
+                                        trySend(-1)
+                                    }
+                                }
+                        } else {
+                            Log.e("hello", "Failed to delete from users/uploads: ${task.exception}")
+                            trySend(-1)
                         }
-                    } else {
-                        Log.e("hello","Failed to delete from users/uploads: ${task.exception}")
-                        trySend(-1)
                     }
-                }
 
             } else {
-                Log.e("hello","Couldn't delete document from uploads: ${it.exception}")
+                Log.e("hello", "Couldn't delete document from uploads: ${it.exception}")
             }
         }
         awaitClose()
@@ -91,14 +99,89 @@ class FirestoreRepo {
     // get current chat updates
     fun subscribeToMessages(ref: CollectionReference) = callbackFlow {
         val subscription = ref.addSnapshotListener { value, error ->
-         val response = if (error == null) {
-             value?.documents?.let { OnChatSuccess(it) }
-         } else {
-             OnChatError(error)
-         }
+            val response = if (error == null) {
+                value?.documents?.let { OnChatSuccess(it) }
+            } else {
+                OnChatError(error)
+            }
             trySend(response)
 
         }
-        awaitClose { subscription.remove()}
+        awaitClose { subscription.remove() }
+    }
+
+    // send a message
+    fun sendText(
+        text: String,
+        receiverReference: CollectionReference,
+        senderReference: CollectionReference
+    ) = callbackFlow {
+        auth.currentUser?.uid?.let { uid ->
+            val data = mapOf(
+                "message" to text,
+                "senderId" to uid
+            )
+            senderReference.add(data).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    receiverReference.add(data).addOnCompleteListener { task2 ->
+                        if (task.isSuccessful) {
+                            trySend(200)
+
+                        } else {
+                            Log.e(
+                                "hello",
+                                "Error sending text2 ${task.exception?.localizedMessage}"
+                            )
+                            trySend(-1)
+                        }
+                    }
+
+                } else {
+                    Log.e("hello", "Error sending text ${task.exception?.localizedMessage}")
+                    trySend(-1)
+                }
+            }
+        }
+        awaitClose()
+    }
+
+    // add participant details
+    fun addParticipantDetails(
+        senderId: String,
+        senderUsername: String,
+        senderReference: DocumentReference,
+        receiverId: String,
+        receiverUsername: String,
+        receiverReference: DocumentReference
+    ) =
+        callbackFlow {
+            val data = mapOf(
+                "senderId" to senderId,
+                "senderUsername" to senderUsername,
+                "receiverId" to receiverId,
+                "receiverUsername" to receiverUsername
+            )
+            senderReference.set(data).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    receiverReference.set(data).addOnCompleteListener { task2 ->
+                        if (task2.isSuccessful) {
+                            trySend(200)
+                        } else {
+                            Log.e(
+                                "hello",
+                                "Couldn't set participant2 details ${task2.exception?.localizedMessage}"
+                            )
+                            trySend(-1)
+                        }
+                    }
+                } else {
+                    Log.e(
+                        "hello",
+                        "Couldn't set participant details ${task.exception?.localizedMessage}"
+                    )
+                    trySend(-1)
+                }
+            }
+            awaitClose()
         }
 }
