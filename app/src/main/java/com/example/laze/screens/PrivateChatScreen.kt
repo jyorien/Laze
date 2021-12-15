@@ -91,6 +91,8 @@ fun PrivateChatScreen(userId: String, rawImageRef: String, navController: NavCon
                             Log.d("hello","sender ref ${senderRef!!.path}")
                             Log.d("hello","receiver ref ${receiverRef.path}")
                             viewModel.sendText(textToSend, receiverRef, senderRef!!)
+                            textToSend = ""
+
 
                         }) {
                             Text(text = "SEND")
