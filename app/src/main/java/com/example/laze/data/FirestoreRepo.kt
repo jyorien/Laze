@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import java.time.LocalDateTime
 
 class FirestoreRepo {
     private val firestore = FirebaseFirestore.getInstance()
@@ -116,14 +117,15 @@ class FirestoreRepo {
         receiverReference: CollectionReference,
         senderReference: CollectionReference
     ) = callbackFlow {
+        val currentTime = LocalDateTime.now().toString()
         auth.currentUser?.uid?.let { uid ->
             val data = mapOf(
                 "message" to text,
                 "senderId" to uid
             )
-            senderReference.add(data).addOnCompleteListener { task ->
+            senderReference.document(currentTime).set(data).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    receiverReference.add(data).addOnCompleteListener { task2 ->
+                    receiverReference.document(currentTime).set(data).addOnCompleteListener { task2 ->
                         if (task.isSuccessful) {
                             trySend(200)
 
@@ -161,9 +163,16 @@ class FirestoreRepo {
                 "receiverId" to receiverId,
                 "receiverUsername" to receiverUsername
             )
+
+            val data2 = mapOf(
+                "senderId" to receiverId,
+                "senderUsername" to receiverUsername,
+                "receiverId" to senderId,
+                "receiverUsername" to senderUsername
+            )
             senderReference.set(data).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    receiverReference.set(data).addOnCompleteListener { task2 ->
+                    receiverReference.set(data2).addOnCompleteListener { task2 ->
                         if (task2.isSuccessful) {
                             trySend(200)
                         } else {
@@ -184,4 +193,19 @@ class FirestoreRepo {
             }
             awaitClose()
         }
+
+    // get user's chats
+    fun getAllChats() = callbackFlow {
+        val subscription = auth.currentUser?.uid?.let { uid ->
+            firestore.collection("users").document(uid).collection("chats").addSnapshotListener { value, error ->
+                val response = if (error != null) {
+                    OnError(error)
+                } else {
+                    OnSuccess(value)
+                }
+                trySend(response)
+            }
+        }
+        awaitClose { subscription?.remove() }
+    }
 }

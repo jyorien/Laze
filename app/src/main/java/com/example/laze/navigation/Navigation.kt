@@ -18,7 +18,7 @@ fun BottomNavigationHost(navController: NavHostController, viewModel: MainViewMo
         // bottom nav routes
         composable("ViewPostScreen") { ViewPostScreen(viewModel, navController) }
         composable("AddPostScreen") { AddPostScreen(navController) }
-        composable("ChatListScreen") { ChatListScreen() }
+        composable("ChatListScreen") { ChatListScreen(viewModel, navController) }
         composable("UserPostListScreen") { UserPostListScreen() }
 
         // secondary routes
@@ -38,6 +38,27 @@ fun BottomNavigationHost(navController: NavHostController, viewModel: MainViewMo
                     PrivateChatScreen(data, data2, navController, viewModel)
 
                 }
+            }
+        }
+        composable("ListPrivateChatScreen/{userId}/{arr0}/{arr1}/{arr2}") { backStackEntry ->
+            backStackEntry.arguments?.getString("userId")?.let { userId ->
+                backStackEntry.arguments?.getString("arr0")?.let { arr0 ->
+                    backStackEntry.arguments?.getString("arr1")?.let { arr1 ->
+                        backStackEntry.arguments?.getString("arr2")?.let { arr2 ->
+                            ListPrivateChatScreen(
+                                viewModel = viewModel,
+                                userId = userId,
+                                arr0 = arr0,
+                                arr1 = arr1,
+                                arr2 = arr2
+                            )
+
+                        }
+
+                    }
+
+                }
+
             }
         }
     }

@@ -17,6 +17,7 @@ class MainViewModel : ViewModel(){
     val userPostsStateFlow = MutableStateFlow<FireResponse?>(null)
     val deleteStateFlow = MutableStateFlow(0)
     val messagesList = MutableStateFlow<ChatResponse?>(null)
+    val chatsStateFlow = MutableStateFlow<FireResponse?>(null)
     init {
         viewModelScope.launch {
             repo.getPostDetails().collect {
@@ -65,6 +66,14 @@ class MainViewModel : ViewModel(){
         viewModelScope.launch {
             repo.addParticipantDetails(senderId, senderUsername, senderReference, receiverId, receiverUsername, receiverReference).collect {
 
+            }
+        }
+    }
+
+    fun getAllChats() {
+        viewModelScope.launch {
+            repo.getAllChats().collect {
+                chatsStateFlow.value = it
             }
         }
     }
