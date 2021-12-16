@@ -43,13 +43,6 @@ fun LoginScreen(navController: NavController?) {
     var errorMessage by remember { mutableStateOf("") }
     var isChecked by rememberSaveable { mutableStateOf(false) }
 
-    if (context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE)
-            .getBoolean("SignedIn", false) && mAuth.currentUser != null
-    ) {
-        navController!!.navigate(HOME_ROUTE) { navController.popBackStack() }
-        return
-    }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -109,6 +102,12 @@ fun LoginScreen(navController: NavController?) {
                     mAuth.signInWithEmailAndPassword(inputEmail, inputPassword)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                if (isChecked)
+                                    context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE).edit()
+                                        .putBoolean("SignedIn", true).apply()
+                                else
+                                    context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE).edit()
+                                        .putBoolean("SignedIn", false).apply()
                                 navController!!.navigate(HOME_ROUTE) { navController.popBackStack() }
                             } else {
                                 task.exception?.let {
@@ -121,16 +120,7 @@ fun LoginScreen(navController: NavController?) {
                 }
 
                 Row {
-                    Checkbox(checked = isChecked, onCheckedChange = {
-                        isChecked = it
-                        if (isChecked)
-                            context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE).edit()
-                                .putBoolean("SignedIn", true).apply()
-                        else
-                            context.getSharedPreferences("SignedIn", Context.MODE_PRIVATE).edit()
-                                .putBoolean("SignedIn", false).apply()
-
-                    })
+                    Checkbox(checked = isChecked, onCheckedChange = { isChecked = it })
                     Text("Stay signed in")
                 }
 
