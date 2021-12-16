@@ -48,6 +48,7 @@ fun ViewPostScreen(viewModel: MainViewModel, navController: NavController) {
     val storage = FirebaseStorage.getInstance()
     val auth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
+    viewModel.hasBottomNav.value = true
     when (val posts = viewModel.postsStateFlow.asStateFlow().collectAsState().value) {
         is OnError -> {
             Text(text = "Posts couldn't load")

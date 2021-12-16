@@ -1,20 +1,23 @@
 package com.example.laze.navigation
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.laze.HOME_ROUTE
 import com.example.laze.data.MainViewModel
 import com.example.laze.screens.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 @ExperimentalPagerApi
-@Composable
-fun BottomNavigationHost(navController: NavHostController, viewModel: MainViewModel) {
-    NavHost(navController = navController, startDestination = NavigationItem.Home.route) {
+
+fun NavGraphBuilder.bottomNavigationGraph(navController: NavHostController, viewModel: MainViewModel) {
+    navigation(startDestination = NavigationItem.Home.route, route = HOME_ROUTE) {
         // bottom nav routes
         composable("ViewPostScreen") { ViewPostScreen(viewModel, navController) }
         composable("AddPostScreen") { AddPostScreen(navController) }

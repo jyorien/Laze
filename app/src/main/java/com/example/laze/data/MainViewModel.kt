@@ -18,6 +18,7 @@ class MainViewModel : ViewModel(){
     val deleteStateFlow = MutableStateFlow(0)
     val messagesList = MutableStateFlow<ChatResponse?>(null)
     val chatsStateFlow = MutableStateFlow<FireResponse?>(null)
+    var hasBottomNav = MutableStateFlow(false)
     init {
         viewModelScope.launch {
             repo.getPostDetails().collect {
