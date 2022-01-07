@@ -17,3 +17,4 @@ A fusion between TikTok and Carousell but for errands. For lazy people, from a l
 ### CameraX used for camera function
 - CameraX, Android's new Camera API in Jetpack, was used with Jetpack Compose.
 
+ 
